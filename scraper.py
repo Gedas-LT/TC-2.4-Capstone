@@ -2,6 +2,7 @@ from pandas.core.frame import DataFrame
 import requests
 import re
 import pandas as pd
+import warnings
 from bs4 import BeautifulSoup
 from fake_useragent import UserAgent
 from time import sleep
@@ -152,11 +153,14 @@ def df_cleaning(raw_df: DataFrame) -> DataFrame:
             if row == "Billion":
                 final_df[numerical_column][count] = raw_df[numerical_column][count] * 1000000000
 
-    change_num_values("Market Value", "Value Metric")
-    change_num_values("Annual Revenue", "Revenue Metric")
-    change_num_values("Operating Income", "Op Income Metric")
-    change_num_values("Net Income", "Net Income Metric")
-    change_num_values("Assets", "Assets Metric")
-    change_num_values("Liabilities", "Liabilities Metric")
+    # Ignore Python warnings about copying dafaframe.
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        change_num_values("Market Value", "Value Metric")
+        change_num_values("Annual Revenue", "Revenue Metric")
+        change_num_values("Operating Income", "Op Income Metric")
+        change_num_values("Net Income", "Net Income Metric")
+        change_num_values("Assets", "Assets Metric")
+        change_num_values("Liabilities", "Liabilities Metric")
 
     return final_df
