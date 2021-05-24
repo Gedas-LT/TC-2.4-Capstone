@@ -71,71 +71,57 @@ def valuetoday_usa_scraper(n_companies: int) -> DataFrame:
 
         for item in info_blocks:
 
+            def collect_values(item, collected_list):
+                if len(item) == 0:
+                    collected_list.append(None)
+                else:
+                    string = item[0].text.strip() 
+                    value = re.findall("\d+[.,]\d+|^\d+", string)
+                    collected_list.append(value[0])
+
+
+            def collect_metrics(item, collected_list):
+                if len(item) == 0:
+                    collected_list.append(None)
+                else:
+                    string = item[0].text.strip()
+                    if "Billion" in string:
+                        collected_list.append("Billion")
+                    if "Million" in string:
+                        collected_list.append("Million")
+
+            
             name = item.find("h2").text.strip()
             collected_names.append(name)
 
             business = item.select("div.field--name-field-company-category-primary > div > div.field--item > a")[0].text.strip()
             collected_businesses.append(business)
 
-            value = item.select("div.field--name-field-market-value-jan012021 > div.field--item")[0]["content"]
-            collected_values.append(value)
+            market_value = item.select("div.field--name-field-market-value-jan012021 > div.field--item")[0]["content"]
+            collected_values.append(market_value)
 
-            value_string = item.select("div.field--name-field-market-value-jan012021 > div.field--item")[0].text.strip()
-            if "Billion" in value_string:
-                collected_values_metrics.append("Billion")
-            elif "Million" in value_string:
-                collected_values_metrics.append("Million")
+            market_value_item = item.select("div.field--name-field-market-value-jan012021 > div.field--item")
+            collect_metrics(market_value_item, collected_values_metrics)
 
-            revenue_string = item.select("div.field--name-field-annual-revenue > div.field--item")[0].text.strip()
-            revenue = re.findall("\d+[.,]\d+", revenue_string)
-            collected_revenues.append(revenue[0])
+            revenue_item = item.select("div.field--name-field-annual-revenue > div.field--item")
+            collect_values(revenue_item, collected_revenues)
+            collect_metrics(revenue_item, collected_revenues_metrics)
 
-            if "Billion" in revenue_string:
-                collected_revenues_metrics.append("Billion")
-            elif "Million" in revenue_string:
-                collected_revenues_metrics.append("Million")
-                
             op_income_item = item.select("div.field--name-field-annual-operating-income > div.field--item")
-            if len(op_income_item) == 0:
-                collected_op_incomes.append(None)
-            else:
-                op_income_string = op_income_item[0].text.strip()
-                op_income = re.findall("\d+[.,]\d+", op_income_string)
-                collected_op_incomes.append(op_income[0])
+            collect_values(op_income_item, collected_op_incomes)
+            collect_metrics(op_income_item, collected_op_incomes_metrics)
 
-            if len(op_income_item) == 0:
-                collected_op_incomes_metrics.append(None)
-            elif "Billion" in op_income_string:
-                collected_op_incomes_metrics.append("Billion")
-            elif "Million" in op_income_string:
-                collected_op_incomes_metrics.append("Million")
+            net_income_item = item.select("div.field--name-field-annual-revenue > div.field--item")
+            collect_values(net_income_item, collected_net_incomes)
+            collect_metrics(net_income_item, collected_net_incomes_metrics)
 
-            net_income_string = item.select("div.field--name-field-annual-revenue > div.field--item")[0].text.strip()
-            net_income = re.findall("\d+[.,]\d+", net_income_string)
-            collected_net_incomes.append(net_income[0])
+            assets_item = item.select("div.field--name-field-total-assets > div.field--item")
+            collect_values(assets_item, collected_assets)
+            collect_metrics(assets_item, collected_assets_metrics)
 
-            if "Billion" in net_income_string:
-                collected_net_incomes_metrics.append("Billion")
-            elif "Million" in net_income_string:
-                collected_net_incomes_metrics.append("Million")
-
-            assets_string = item.select("div.field--name-field-total-assets > div.field--item")[0].text.strip()
-            assets = re.findall("\d+[.,]\d+", assets_string)
-            collected_assets.append(assets[0])
-
-            if "Billion" in assets_string:
-                collected_assets_metrics.append("Billion")
-            elif "Million" in assets_string:
-                collected_assets_metrics.append("Million")
-
-            liabilities_string = item.select("div.field--name-field-total-liabilities- > div.field--item")[0].text.strip()
-            liabilities = re.findall("\d+[.,]\d+", liabilities_string)
-            collected_liabilities.append(liabilities[0])
-
-            if "Billion" in liabilities_string:
-                collected_liabilities_metrics.append("Billion")
-            elif "Million" in liabilities_string:
-                collected_liabilities_metrics.append("Million")
+            liabilities_item = item.select("div.field--name-field-total-liabilities- > div.field--item")
+            collect_values(liabilities_item, collected_liabilities)
+            collect_metrics(liabilities_item, collected_liabilities_metrics)
 
         sleep(2)
 
