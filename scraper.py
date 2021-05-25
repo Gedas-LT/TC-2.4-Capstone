@@ -72,15 +72,17 @@ def valuetoday_usa_scraper(n_companies: int) -> DataFrame:
         for item in info_blocks:
 
             def collect_values(item, collected_list):
+                """Takes in parsed div tag, name of particular list and append extracted or None values to that list."""
                 if len(item) == 0:
                     collected_list.append(None)
                 else:
                     string = item[0].text.strip() 
-                    value = re.findall("\d+[.,]\d+|^\d+", string)
+                    value = re.findall("\d+[.,]\d+|\b(?<!-)\d+\b", string)
                     collected_list.append(value[0])
 
 
             def collect_metrics(item, collected_list):
+                """Takes in parsed div tag, name of particular list and append extracted or None values to that list."""
                 if len(item) == 0:
                     collected_list.append(None)
                 else:
@@ -91,17 +93,19 @@ def valuetoday_usa_scraper(n_companies: int) -> DataFrame:
                         collected_list.append("Million")
 
             
+            market_value_item = item.select("div.field--name-field-market-value-jan012021 > div.field--item")
+            if len(market_value_item) == 0:
+                continue
+            else:
+                market_value = market_value_item[0]["content"]
+                collected_values.append(market_value)
+            collect_metrics(market_value_item, collected_values_metrics)
+
             name = item.find("h2").text.strip()
             collected_names.append(name)
 
             business = item.select("div.field--name-field-company-category-primary > div > div.field--item > a")[0].text.strip()
             collected_businesses.append(business)
-
-            market_value = item.select("div.field--name-field-market-value-jan012021 > div.field--item")[0]["content"]
-            collected_values.append(market_value)
-
-            market_value_item = item.select("div.field--name-field-market-value-jan012021 > div.field--item")
-            collect_metrics(market_value_item, collected_values_metrics)
 
             revenue_item = item.select("div.field--name-field-annual-revenue > div.field--item")
             collect_values(revenue_item, collected_revenues)
@@ -168,3 +172,9 @@ def df_cleaning(raw_df: DataFrame) -> DataFrame:
         change_num_values("Liabilities", "Liabilities Metric")
 
     return final_df
+
+
+def save_csv(data: DataFrame, file_name: str) -> None:
+    """Takes in dataframe, file name and save that dataframe to .csv file in working directory."""
+    
+    data.to_csv(f"{file_name}.csv", index=False)
