@@ -73,23 +73,23 @@ def valuetoday_usa_scraper(n_companies: int) -> DataFrame:
 
             def collect_values(item, collected_list):
                 """Takes in parsed div tag, name of particular list and append extracted or None values to that list."""
-                if len(item) == 0:
+                if len(item) == 0 or len(item) >= 2:
                     collected_list.append(None)
                 else:
                     string = item[0].text.strip() 
-                    value = re.findall("\S\d+[.,]\d+|\\b(?<![a-zA-Z]-)\d+\\b|(?<!\S)-\d+", string)[0]
+                    value = re.findall("\d+[.,]\d+|\\b(?<![a-zA-Z]-)\d+\\b|(?<!\S)-\d+.\d+", string)[0]
                     collected_list.append(value)
 
 
             def collect_metrics(item, collected_list):
                 """Takes in parsed div tag, name of particular list and append extracted or None values to that list."""
-                if len(item) == 0:
+                if len(item) == 0 or len(item) >= 2:
                     collected_list.append(None)
                 else:
                     string = item[0].text.strip()
-                    if "Billion" in string:
+                    if "billion" in string.lower():
                         collected_list.append("Billion")
-                    if "Million" in string:
+                    if "million" in string.lower():
                         collected_list.append("Million")
 
             
