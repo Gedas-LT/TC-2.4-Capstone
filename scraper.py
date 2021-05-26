@@ -77,8 +77,8 @@ def valuetoday_usa_scraper(n_companies: int) -> DataFrame:
                     collected_list.append(None)
                 else:
                     string = item[0].text.strip() 
-                    value = re.findall("\d+[.,]\d+|\b(?<!-)\d+\b", string)
-                    collected_list.append(value[0])
+                    value = re.findall("\S\d+[.,]\d+|\\b(?<![a-zA-Z]-)\d+\\b|(?<!\S)-\d+", string)[0]
+                    collected_list.append(value)
 
 
             def collect_metrics(item, collected_list):
@@ -115,7 +115,7 @@ def valuetoday_usa_scraper(n_companies: int) -> DataFrame:
             collect_values(op_income_item, collected_op_incomes)
             collect_metrics(op_income_item, collected_op_incomes_metrics)
 
-            net_income_item = item.select("div.field--name-field-annual-revenue > div.field--item")
+            net_income_item = item.select("div.field--name-field-annual-net-income-lc > div.field--item")
             collect_values(net_income_item, collected_net_incomes)
             collect_metrics(net_income_item, collected_net_incomes_metrics)
 
