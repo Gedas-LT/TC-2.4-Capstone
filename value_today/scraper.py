@@ -81,9 +81,9 @@ class Scraper:
         max_companies = self.number_companies()
 
         if n_companies > max_companies:
-            return print("Too much companies.")
+            return "Too much companies."
         if n_companies <= 0:
-            return print("Check the number.")
+            return "Check the number."
 
         ua = UserAgent()
         header = {'User-Agent':str(ua.chrome)}
