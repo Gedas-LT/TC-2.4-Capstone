@@ -141,7 +141,7 @@ def valuetoday_usa_scraper(n_companies: int) -> DataFrame:
 
 
 def df_cleaning(raw_df: DataFrame) -> DataFrame:
-    """Takes in initial dataframe from data_scraper function and returns
+    """Takes in initial dataframe from valuetoday_usa_scraper function and returns
     cleaned dataframe with whole numerical values."""
 
     numeric_columns = ["Market Value", "Annual Revenue", "Operating Income", "Net Income", "Assets", "Liabilities"]
